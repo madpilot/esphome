@@ -1,0 +1,65 @@
+esphome:
+  name: side-garden-sprinkler
+  platform: ESP32
+  board: esp32dev
+
+switch:
+  - platform: gpio
+    id: solenoid
+    pin: 18
+    name: "Side Garden Sprinklers"
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      then:
+        - delay: 1200s
+        - switch.turn_off: solenoid
+
+esp32_ble_tracker:
+
+sensor:
+  - platform: xiaomi_hhccjcy01
+    mac_address: 'C4:7C:8D:65:68:E6'
+    temperature:
+      name: "Side Garden Temperature"
+    moisture:
+      name: "Side Garden Moisture"
+    illuminance:
+      name: "Side Garden Illuminance"
+    conductivity:
+      name: "Side Garden Soil Conductivity"
+    battery_level:
+      name: "Side Garden Battery Level"
+
+binary_sensor:
+  - platform: gpio
+    id: button
+    pin: 
+      number: 22
+      mode: INPUT_PULLDOWN
+    on_click:
+      min_length: 50ms
+      max_length: 350ms
+      then:
+        - switch.toggle: solenoid
+
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  password: ""
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Side-Garden-Sprinkler"
+    password: ""
+
+captive_portal:

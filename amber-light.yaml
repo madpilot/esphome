@@ -1,22 +1,24 @@
 esphome:
-  name: hazels-lamp
+  name: amber-light
   platform: ESP8266
-  board: nodemcu
+  board: esp01_1m
+
+switch:
+  - platform: gpio
+    id: output_relay
+    pin: 5
+    name: "Amber Light Switch"
+    restore_mode: ALWAYS_ON
 
 light:
   - platform: fastled_clockless
-    chipset: WS2811
-    pin: 5
-    num_leds: 6
+    chipset: WS2812b
+    pin: 13
+    num_leds: 1
     rgb_order: GRB
-    name: "Hazel's Lamp"
+    name: "Amber Light LED"
     default_transition_length: 0s
-    effects:
-      - random:
-      - strobe: 
-      - flicker:
-      - addressable_rainbow:
-
+    
 # Enable logging
 logger:
 
@@ -33,7 +35,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Hazel's Lamp"
+    ssid: "Amber Light"
     password: ""
 
 captive_portal:
