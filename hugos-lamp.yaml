@@ -11,6 +11,11 @@ light:
     rgb_order: GRB
     name: "Hugo's Lamp"
     default_transition_length: 0s
+    effects:
+      - random:
+      - strobe: 
+      - flicker:
+      - addressable_rainbow:
 
 # Enable logging
 logger:

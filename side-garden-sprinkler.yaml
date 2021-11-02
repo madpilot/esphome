@@ -1,12 +1,12 @@
 esphome:
   name: side-garden-sprinkler
   platform: ESP32
-  board: nodemcu-32s
+  board: esp32dev
 
 switch:
   - platform: gpio
     id: solenoid
-    pin: 23
+    pin: 18
     name: "Side Garden Sprinklers"
     restore_mode: ALWAYS_OFF
     on_turn_on:
@@ -18,7 +18,7 @@ esp32_ble_tracker:
 
 sensor:
   - platform: xiaomi_hhccjcy01
-    mac_address: 'C4:7C:8D:6B:9B:29'
+    mac_address: 'C4:7C:8D:65:68:E6'
     temperature:
       name: "Side Garden Temperature"
     moisture:
