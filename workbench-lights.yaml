@@ -1,15 +1,15 @@
 esphome:
-  name: hazels-lamp
+  name: workbench-lights
   platform: ESP8266
   board: nodemcu
 
 light:
   - platform: fastled_clockless
     chipset: WS2811
-    pin: 5
-    num_leds: 6
+    pin: D3
+    num_leds: 60
     rgb_order: GRB
-    name: "Hazel's Lamp"
+    name: "Workbench Light"
     default_transition_length: 0s
     effects:
       - random:
@@ -33,7 +33,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Hazel's Lamp"
+    ssid: "Workbench Light"
     password: ""
 
 captive_portal:
