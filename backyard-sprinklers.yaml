@@ -1,6 +1,6 @@
 # See https://esphome.io/components/sprinkler.html
 esphome:
-  name: backyard-sprinkler
+  name: backyard-sprinklers
 
 esp32:
   board: esp32dev
@@ -36,7 +36,7 @@ sprinkler:
     auto_advance_switch: "Backyard Lawn Sprinklers Auto Advance"
     reverse_switch: "Backyard Lawn Sprinklers Reverse"
     standby_switch: "Backyard Lawn Sprinklers Standby"
-    queue_switch: "Enable Backyard Lawn Sprinklers Queue"
+    queue_enable_switch: "Enable Backyard Lawn Sprinklers Queue"
     valves:
       - valve_switch: "Main Lawn"
         enable_switch: "Enable Main Lawn"
@@ -57,7 +57,7 @@ sprinkler:
     auto_advance_switch: "Backyard Garden Bed Sprinklers Auto Advance"
     reverse_switch: "Backyard Garden Bed Sprinklers Reverse"
     standby_switch: "Backyard Garden Bed Sprinklers Standby"
-    queue_switch: "Enable Backyard Gardwn Bed Sprinklers Queue"
+    queue_enable_switch: "Enable Backyard Gardwn Bed Sprinklers Queue"
     valves:
       - valve_switch: "Vegetable Patch"
         enable_switch: "Enable Vegetable Patch"
