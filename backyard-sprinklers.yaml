@@ -67,12 +67,12 @@ sprinkler:
           unit_of_measurement: min
         valve_switch_id: zone_3
       - valve_switch: "Side Garden Bed"
-        enable_switch: "Side Garden Bed"
+        enable_switch: "Enable Side Garden Bed"
         run_duration_number: 
           name: "Side Garden Bed Run Duration"
           initial_value: 10
           unit_of_measurement: min
-        valve_switch_id: zone_3
+        valve_switch_id: zone_4
 
 # Enable logging
 logger:
