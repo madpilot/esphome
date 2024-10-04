@@ -7,40 +7,19 @@ switch:
   - platform: gpio
     id: solenoid
     pin: 18
-    name: "Side Garden Sprinklers"
     restore_mode: ALWAYS_OFF
-    on_turn_on:
-      then:
-        - delay: 1200s
-        - switch.turn_off: solenoid
+    internal: true
 
-esp32_ble_tracker:
-
-sensor:
-  - platform: xiaomi_hhccjcy01
-    mac_address: 'C4:7C:8D:65:68:E6'
-    temperature:
-      name: "Side Garden Temperature"
-    moisture:
-      name: "Side Garden Moisture"
-    illuminance:
-      name: "Side Garden Illuminance"
-    conductivity:
-      name: "Side Garden Soil Conductivity"
-    battery_level:
-      name: "Side Garden Battery Level"
-
-binary_sensor:
-  - platform: gpio
-    id: button
-    pin: 
-      number: 22
-      mode: INPUT_PULLDOWN
-    on_click:
-      min_length: 50ms
-      max_length: 350ms
-      then:
-        - switch.toggle: solenoid
+sprinkler:
+  - id: side_garden_controller
+    standby_switch: "Side Garden Sprinklers Standby"
+    valves:
+      - valve_switch: "Side Garden"
+        run_duration_number: 
+          name: "Side Garden Run Duration"
+          initial_value: 10
+          unit_of_measurement: min
+        valve_switch_id: solenoid
 
 
 # Enable logging
@@ -51,7 +30,8 @@ api:
   password: ""
 
 ota:
-  password: ""
+  - platform: esphome
+    password: ""
 
 wifi:
   ssid: !secret iot_wifi_ssid
