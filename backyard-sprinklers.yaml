@@ -62,7 +62,7 @@ sprinkler:
       - valve_switch: "Vegetable Patch"
         enable_switch: "Enable Vegetable Patch"
         run_duration_number:
-          name: "Vegetabke Run Duration"
+          name: "Vegetable Run Duration"
           initial_value: 10
           unit_of_measurement: min
         valve_switch_id: zone_3
