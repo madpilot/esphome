@@ -1,0 +1,95 @@
+# See https://esphome.io/components/sprinkler.html
+esphome:
+  name: backyard-sprinkler
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Define the switches based on the zone pins
+switch:
+  - platform: gpio
+    id: zone_1
+    pin: GPIO32
+    internal: true
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    id: zone_2
+    pin: GPIO33
+    internal: true
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    id: zone_3
+    pin: GPIO25
+    internal: true
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    id: zone_4
+    pin: GPIO26
+    internal: true
+    restore_mode: ALWAYS_OFF
+
+sprinkler:
+  - id: backyard_lawn_controller
+    main_switch: "Backyard Lawn Sprinklers"
+    auto_advance_switch: "Backyard Lawn Sprinklers Auto Advance"
+    reverse_switch: "Backyard Lawn Sprinklers Reverse"
+    standby_switch: "Backyard Lawn Sprinklers Standby"
+    valves:
+      - valve_switch: "Main Lawn"
+        enable_switch: "Enable Main Lawn"
+        run_duration_number: 
+          name: "Main Lawn Run Duration"
+          initial_value: 20
+          unit_of_measurement: min
+        valve_switch_id: zone_1
+      - valve_switch: "Side Lawn"
+        enable_switch: "Enable Side Lawn"
+        run_duration_number: 
+          name: "Side Lawn Run Duration"
+          initial_value: 20
+          unit_of_measurement: min
+        valve_switch_id: zone_2
+  - id: backyard_garden_bed_controller
+    main_switch: "Backyard Garden Bed Sprinklers"
+    auto_advance_switch: "Backyard Garden Bed Sprinklers Auto Advance"
+    reverse_switch: "Backyard Garden Bed Sprinklers Reverse"
+    standby_switch: "Backyard Garden Bed Sprinklers Standby"
+    valves:
+      - valve_switch: "Vegetable Patch"
+        enable_switch: "Enable Vegetable Patch"
+        run_duration_number:
+          name: "Vegetabke Run Duration"
+          initial_value: 10
+          unit_of_measurement: min
+        valve_switch_id: zone_3
+      - valve_switch: "Side Garden Bed"
+        enable_switch: "Side Garden Bed"
+        run_duration_number: 
+          name: "Side Garden Bed Run Duration"
+          initial_value: 10
+          unit_of_measurement: min
+        valve_switch_id: zone_3
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  ssid: !secret iot_wifi_ssid
+  password: !secret iot_wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Backyard-Sprinkler"
+    password: ""
+
+captive_portal:
