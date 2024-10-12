@@ -31,12 +31,12 @@ switch:
     restore_mode: ALWAYS_OFF
 
 sprinkler:
-  - id: backyard_lawn_controller
-    main_switch: "Backyard Lawn Sprinklers"
-    auto_advance_switch: "Backyard Lawn Sprinklers Auto Advance"
-    reverse_switch: "Backyard Lawn Sprinklers Reverse"
-    standby_switch: "Backyard Lawn Sprinklers Standby"
-    queue_enable_switch: "Enable Backyard Lawn Sprinklers Queue"
+  - id: backyard_controller
+    main_switch: "Backyard Sprinklers"
+    auto_advance_switch: "Backyard Sprinklers Auto Advance"
+    reverse_switch: "Backyard Sprinklers Reverse"
+    standby_switch: "Backyard Sprinklers Standby"
+    queue_enable_switch: "Enable Backyard Sprinklers Queue"
     valves:
       - valve_switch: "Main Lawn"
         enable_switch: "Enable Main Lawn"
@@ -51,21 +51,14 @@ sprinkler:
           name: "Side Lawn Run Duration"
           initial_value: 20
           unit_of_measurement: min
-        valve_switch_id: zone_2
-  - id: backyard_garden_bed_controller
-    main_switch: "Backyard Garden Bed Sprinklers"
-    auto_advance_switch: "Backyard Garden Bed Sprinklers Auto Advance"
-    reverse_switch: "Backyard Garden Bed Sprinklers Reverse"
-    standby_switch: "Backyard Garden Bed Sprinklers Standby"
-    queue_enable_switch: "Enable Backyard Gardwn Bed Sprinklers Queue"
-    valves:
+        valve_switch_id: zone_3
       - valve_switch: "Vegetable Patch"
         enable_switch: "Enable Vegetable Patch"
         run_duration_number:
           name: "Vegetable Run Duration"
           initial_value: 10
           unit_of_measurement: min
-        valve_switch_id: zone_3
+        valve_switch_id: zone_2
       - valve_switch: "Side Garden Bed"
         enable_switch: "Enable Side Garden Bed"
         run_duration_number: 
@@ -80,7 +73,37 @@ logger:
 # Enable Home Assistant API
 api:
   password: ""
-
+  actions:
+    - action: clear_queued_valves
+      then:
+        - sprinkler.clear_queued_valves:
+            id: backyard_controller 
+    - action: queue_valve
+      variables:
+        valve_number: int
+        run_duration: int
+      then:
+        - sprinkler.queue_valve:
+            id: backyard_controller
+            valve_number: !lambda 'return valve_number;'
+            run_duration: !lambda 'return run_duration;'
+    - action: start_from_queue
+      then:
+        - sprinkler.start_from_queue:
+            id: backyard_controller
+    - action: start_full_cycle
+      then:
+        - sprinkler.start_full_cycle: backyard_controller
+    - action: shutdown
+      then:
+        - sprinkler.shutdown: backyard_controller
+    - action: pause
+      then:
+        - sprinkler.pause: backyard_controller
+    - action: resume
+      then:
+        - sprinkler.resume: backyard_controller
+ 
 ota:
   - platform: esphome
     password: ""
