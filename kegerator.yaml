@@ -1,0 +1,70 @@
+esphome:
+  name: kegerator
+  
+esp32:
+  board: esp32dev
+
+#i2c:
+  #sda: GPI35
+  #scl: GPI32
+
+#display:
+  #- platform: ssd1306_i2c
+    #model: "SSD1306 128x32"
+    #lambda: |-
+      #it.printf(0, 0, id(my_font), "Temperature: %.1f°C", id(temperature).state
+one_wire:
+  - platform: gpio
+    pin: GPIO25
+
+sensor:
+  - platform: dallas_temp
+    id: temperature
+    name: "Temperature"
+    update_interval: 1s
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 1
+    filters:
+      - exponential_moving_average:
+          alpha: 0.8
+          send_every: 30
+
+switch:
+  - platform: gpio
+    id: compressor
+    pin: GPIO16
+    internal: true
+    restore_mode: RESTORE_DEFAULT_OFF
+
+climate:
+  - platform: thermostat
+    name: "Kegerator"
+    sensor: temperature
+    cool_action:
+      - switch.turn_on: compressor
+    idle_action:
+      - switch.turn_off: compressor
+    min_cooling_off_time: 30s
+    min_cooling_run_time: 30s
+    min_idle_time: 30s
+
+logger:
+
+api:
+  password: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  ssid: !secret iot_wifi_ssid
+  password: !secret iot_wifi_password
+
+  ap:
+    ssid: "Kegerator"
+    password: ""
+
+captive_portal:
