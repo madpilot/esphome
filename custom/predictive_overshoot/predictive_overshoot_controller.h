@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -72,7 +73,7 @@ extern "C"
 
   void predictive_overshoot_controller_init(predictive_overshoot_controller_t *context, float set_point, float_range_t deadband, predictive_overshoot_time_t cooling_time, predictive_overshoot_time_t heating_time, predictive_overshoot_controller_mode_t mode);
   void predictive_overshoot_controller_run(predictive_overshoot_controller_t *context);
-  void predictive_overshoot_controller_update(float value);
+  void predictive_overshoot_controller_update(predictive_overshoot_controller_t *context, float value);
 
   predictive_overshoot_error_t predictive_overshoot_controller_set_set_point(predictive_overshoot_controller_t *context, float set_point);
   predictive_overshoot_error_t predictive_overshoot_controller_set_sample_time(predictive_overshoot_controller_t *context, unsigned long sample_time);

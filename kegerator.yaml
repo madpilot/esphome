@@ -1,18 +1,23 @@
 esphome:
   name: kegerator
-  
+
 esp32:
   board: esp32dev
 
+external_components:
+  - source:
+      type: local
+      path: custom
+
 #i2c:
-  #sda: GPI35
-  #scl: GPI32
+#sda: GPI35
+#scl: GPI32
 
 #display:
-  #- platform: ssd1306_i2c
-    #model: "SSD1306 128x32"
-    #lambda: |-
-      #it.printf(0, 0, id(my_font), "Temperature: %.1f°C", id(temperature).state
+#- platform: ssd1306_i2c
+#model: "SSD1306 128x32"
+#lambda: |-
+#it.printf(0, 0, id(my_font), "Temperature: %.1f°C", id(temperature).state
 one_wire:
   - platform: gpio
     pin: GPIO25
@@ -39,16 +44,13 @@ switch:
     restore_mode: RESTORE_DEFAULT_OFF
 
 climate:
-  - platform: thermostat
+  - platform: predictive_overshoot
     name: "Kegerator"
     sensor: temperature
     cool_action:
       - switch.turn_on: compressor
     idle_action:
       - switch.turn_off: compressor
-    min_cooling_off_time: 30s
-    min_cooling_run_time: 30s
-    min_idle_time: 30s
 
 logger:
 

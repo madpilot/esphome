@@ -32,10 +32,6 @@ void predictive_overshoot_controller_init(predictive_overshoot_controller_t *con
 
   predictive_overshoot_controller_set_enable(context, false);
   predictive_overshoot_controller_set_mode(context, mode);
-
-#ifdef ENABLE_IS_ENABLED
-  context->sink.is_enabled = &predictive_overshoot_controller_is_enabled;
-#endif
 }
 
 void predictive_overshoot_controller_update(predictive_overshoot_controller_t *context, float value)
