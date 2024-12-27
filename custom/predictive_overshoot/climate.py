@@ -8,6 +8,14 @@ from esphome.const import (
     CONF_IDLE_ACTION,
     CONF_COOL_ACTION,
     CONF_HEAT_ACTION,
+    CONF_COOL_DEADBAND,
+    CONF_HEAT_DEADBAND,
+    CONF_MIN_COOLING_OFF_TIME,
+    CONF_MIN_COOLING_RUN_TIME,
+    CONF_MAX_COOLING_RUN_TIME,
+    CONF_MIN_HEATING_OFF_TIME,
+    CONF_MIN_HEATING_RUN_TIME,
+    CONF_MAX_HEATING_RUN_TIME,
 )
 
 predictive_overshoot_ns = cg.esphome_ns.namespace("predictive_overshoot")
@@ -23,14 +31,14 @@ CONFIG_SCHEMA = cv.All(
             cv.Required(CONF_IDLE_ACTION): automation.validate_automation(single=True),
             cv.Optional(CONF_COOL_ACTION): automation.validate_automation(single=True),
             cv.Optional(CONF_HEAT_ACTION): automation.validate_automation(single=True),
-            # cv.Optional("deadband_lower"): cv.float_,
-            # cv.Optional("deadband_upper"): cv.float_,
-            # cv.Optional("cooling_time_off"): cv.int_,
-            # cv.Optional("cooling_time_minimum_on"): cv.int_,
-            # cv.Optional("cooling_time_maximum_on"): cv.int_,
-            # cv.Optional("heating_time_off"): cv.int_,
-            # cv.Optional("heating_time_minimum_on"): cv.int_,
-            # cv.Optional("heating_time_maximum_on"): cv.int_,
+            cv.Optional(CONF_COOL_DEADBAND): cv.float_,
+            cv.Optional(CONF_HEAT_DEADBAND): cv.float_,
+            cv.Optional(CONF_MIN_COOLING_OFF_TIME): cv.int_,
+            cv.Optional(CONF_MIN_COOLING_RUN_TIME): cv.int_,
+            cv.Optional(CONF_MAX_COOLING_RUN_TIME): cv.int_,
+            cv.Optional(CONF_MIN_HEATING_OFF_TIME): cv.int_,
+            cv.Optional(CONF_MIN_HEATING_RUN_TIME): cv.int_,
+            cv.Optional(CONF_MAX_HEATING_RUN_TIME): cv.int_,
         }
     ).extend(cv.COMPONENT_SCHEMA),
     cv.has_at_least_one_key(CONF_COOL_ACTION, CONF_HEAT_ACTION),
@@ -58,3 +66,27 @@ async def to_code(config):
         await automation.build_automation(
             var.get_heat_action_trigger(), [], config[CONF_HEAT_ACTION]
         )
+
+    if CONF_HEAT_DEADBAND in config:
+        cg.add(var.set_deadband_low(config[CONF_HEAT_DEADBAND]))
+
+    if CONF_COOL_DEADBAND in config:
+        cg.add(var.set_deadband_high(config[CONF_COOL_DEADBAND]))
+
+    if CONF_MIN_COOLING_OFF_TIME in config:
+        cg.add(var.set_cooling_off_time(config[CONF_MIN_COOLING_OFF_TIME]))
+
+    if CONF_MIN_COOLING_RUN_TIME in config:
+        cg.add(var.set_cooling_minimum_on_time(config[CONF_MIN_COOLING_RUN_TIME]))
+
+    if CONF_MAX_COOLING_RUN_TIME in config:
+        cg.add(var.set_cooling_maximum_on_time(config[CONF_MAX_COOLING_RUN_TIME]))
+
+    if CONF_MIN_HEATING_OFF_TIME in config:
+        cg.add(var.set_heating_off_time(config[CONF_MIN_HEATING_OFF_TIME]))
+
+    if CONF_MIN_HEATING_RUN_TIME in config:
+        cg.add(var.set_heating_minimum_on_time(config[CONF_MIN_HEATING_RUN_TIME]))
+
+    if CONF_MAX_HEATING_RUN_TIME in config:
+        cg.add(var.set_heating_maximum_on_time(config[CONF_MAX_HEATING_RUN_TIME]))
