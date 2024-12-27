@@ -52,12 +52,59 @@ namespace esphome
 			this->set_interval(this->context.sample_time, std::bind(&PredictiveOvershootClimate::run, this));
 		}
 
+		void PredictiveOvershootClimate::dump_config()
+		{
+			LOG_CLIMATE("", "Predictive Overshoot", this);
+
+			ESP_LOGCONFIG(TAG, "  Cooling Deadband: %f", this->context.deadband.upper);
+			ESP_LOGCONFIG(TAG, "  Heating Deadband: %f", this->context.deadband.lower);
+			ESP_LOGCONFIG(TAG, "  Cooling Min Off Time: %i", this->context.cooling_time.off);
+			ESP_LOGCONFIG(TAG, "  Cooling Min Run Time: %i", this->context.cooling_time.minimum_on);
+			ESP_LOGCONFIG(TAG, "  Cooling Max Off Time: %i", this->context.cooling_time.maximum_on);
+			ESP_LOGCONFIG(TAG, "  Heating Min Off Time: %i", this->context.heating_time.off);
+			ESP_LOGCONFIG(TAG, "  Heating Min Run Time: %i", this->context.heating_time.minimum_on);
+			ESP_LOGCONFIG(TAG, "  Heating Max Off Time: %i", this->context.heating_time.maximum_on);
+		}
+
 		void PredictiveOvershootClimate::run()
 		{
 			ESP_LOGI(TAG, "Running predictive overshoot loop.");
 			this->context.current_input = this->current_temperature;
 
 			predictive_overshoot_controller_run(&this->context);
+
+			switch (this->context.state)
+			{
+			case PREDICTIVE_OVERSHOOT_IDLE:
+				ESP_LOGD(TAG, "State: IDLE");
+				break;
+			case PREDICTIVE_OVERSHOOT_COOLING_IDLE:
+				ESP_LOGD(TAG, "State: COOLING IDLE");
+				break;
+			case PREDICTIVE_OVERSHOOT_COOLING:
+				ESP_LOGD(TAG, "State: COOLING");
+				break;
+			case PREDICTIVE_OVERSHOOT_COOLING_OFF:
+				ESP_LOGD(TAG, "State: COOLING_OFF");
+				break;
+			case PREDICTIVE_OVERSHOOT_HEATING_IDLE:
+				ESP_LOGD(TAG, "State: HEATING IDLE");
+				break;
+			case PREDICTIVE_OVERSHOOT_HEATING:
+				ESP_LOGD(TAG, "State: HEATING");
+				break;
+			case PREDICTIVE_OVERSHOOT_HEATING_OFF:
+				ESP_LOGD(TAG, "State: HEATING_OFF");
+				break;
+			default:
+				ESP_LOGD(TAG, "State: UNKNOWN");
+				break;
+			}
+			ESP_LOGD(TAG, "Overshoot Per Hour: %d", this->context.overshoot_per_hour);
+			ESP_LOGD(TAG, "Sample Time: %d", this->context.sample_time);
+			ESP_LOGD(TAG, "Time elapsed: %d", this->context.time_elapsed);
+			ESP_LOGD(TAG, "Peak: %d", this->context.peak);
+			ESP_LOGD(TAG, "Estimated Peak: %d", this->context.estimated_peak);
 
 			if (this->context.cooling_on && this->action != climate::CLIMATE_ACTION_COOLING)
 			{

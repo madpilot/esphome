@@ -14,7 +14,7 @@ namespace esphome
 		public:
 			PredictiveOvershootClimate() = default;
 			void setup() override;
-			// void dump_config() override;
+			void dump_config() override;
 
 			Trigger<> *get_idle_action_trigger() const { return this->idle_action_trigger_; }
 			Trigger<> *get_cool_action_trigger() const { return this->cool_action_trigger_; }
