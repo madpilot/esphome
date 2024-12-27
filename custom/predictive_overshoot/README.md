@@ -14,7 +14,7 @@ climate:
     cool_action:
       - switch.turn_on: compressor
     idle_action:
-      - switch.turn_off: compressor
+      - switch.turn_off: heater
     cool_deadband: 1
     heat_deadband: 1
     min_cooling_off_time: 20s
@@ -25,13 +25,13 @@ climate:
     max_heating_run_time: 20s
 ```
 
-## Configuration Variables:
+## Configuration Variables
 
 The thermostat controller uses the sensor to determine whether it should heat or cool.
 
 - `sensor` (**Required**, ID): The sensor that is used to measure the current temperature.
 
-## Heating and Cooling Actions:
+## Heating and Cooling Actions
 
 - `idle_action` (**Required**, Action): The action to call when the climate device should enter its idle state (not cooling, not heating).
 - `cool_action` (**Optional**, Action): The action to call when the climate device should enter cooling mode to decrease the current temperature.
