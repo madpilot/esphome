@@ -6,10 +6,6 @@ bool predictive_overshoot_controller_get_enable(predictive_overshoot_controller_
 bool predictive_overshoot_controller_can_cool(predictive_overshoot_controller_t *context);
 bool predictive_overshoot_controller_can_heat(predictive_overshoot_controller_t *context);
 
-#ifdef ENABLE_IS_ENABLED
-bool predictive_overshoot_controller_is_enabled(analog_sink_t *sink);
-#endif
-
 void predictive_overshoot_controller_init(predictive_overshoot_controller_t *context, float set_point, float_range_t deadband, predictive_overshoot_time_t cooling_time, predictive_overshoot_time_t heating_time, predictive_overshoot_controller_mode_t mode)
 {
   context->set_point = set_point;
@@ -30,7 +26,7 @@ void predictive_overshoot_controller_init(predictive_overshoot_controller_t *con
   context->heating_on = false;
   context->cooling_on = false;
 
-  predictive_overshoot_controller_set_enable(context, false);
+  predictive_overshoot_controller_set_enable(context, true);
   predictive_overshoot_controller_set_mode(context, mode);
 }
 
