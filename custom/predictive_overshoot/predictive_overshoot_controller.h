@@ -53,6 +53,12 @@ extern "C"
     float set_point;
     float_range_t overshoot_per_hour;
 
+    float min_percentage_increase;
+    float max_percentage_increase;
+    float min_percentage_decrease;
+    float max_percentage_decrease;
+    float kp;
+
     float current_input;
     float last_output;
     unsigned long sample_time;
@@ -71,7 +77,7 @@ extern "C"
     bool heating_on;
   } predictive_overshoot_controller_t;
 
-  void predictive_overshoot_controller_init(predictive_overshoot_controller_t *context, float set_point, float_range_t deadband, predictive_overshoot_time_t cooling_time, predictive_overshoot_time_t heating_time, predictive_overshoot_controller_mode_t mode);
+  void predictive_overshoot_controller_init(predictive_overshoot_controller_t *context, float set_point, float_range_t deadband, predictive_overshoot_time_t cooling_time, predictive_overshoot_time_t heating_time, predictive_overshoot_controller_mode_t mode, float kp, float min_percentage_increase, float max_percentage_increase, float min_percentage_decrease, float max_percentage_decrease);
   void predictive_overshoot_controller_run(predictive_overshoot_controller_t *context);
   void predictive_overshoot_controller_update(predictive_overshoot_controller_t *context, float value);
 
@@ -81,6 +87,12 @@ extern "C"
   predictive_overshoot_error_t predictive_overshoot_controller_set_cooling_time(predictive_overshoot_controller_t *context, predictive_overshoot_time_t cooling_time);
   predictive_overshoot_error_t predictive_overshoot_controller_set_heating_time(predictive_overshoot_controller_t *context, predictive_overshoot_time_t heating_time);
   predictive_overshoot_error_t predictive_overshoot_controller_set_overshoot_per_hour(predictive_overshoot_controller_t *context, float_range_t overshoot_per_hour);
+
+  predictive_overshoot_error_t predictive_overshoot_controller_set_min_percentage_increase(predictive_overshoot_controller_t *context, float min_percentage_increase);
+  predictive_overshoot_error_t predictive_overshoot_controller_set_max_percentage_increase(predictive_overshoot_controller_t *context, float max_percentage_increase);
+  predictive_overshoot_error_t predictive_overshoot_controller_set_min_percentage_decrease(predictive_overshoot_controller_t *context, float min_percentage_decrease);
+  predictive_overshoot_error_t predictive_overshoot_controller_set_max_percentage_decrease(predictive_overshoot_controller_t *context, float max_percentage_decrease);
+  predictive_overshoot_error_t predictive_overshoot_controller_set_kp(predictive_overshoot_controller_t *context, float kp);
 
   float predictive_overshoot_controller_estimate_overshoot(predictive_overshoot_controller_t *context);
   void predictive_overshoot_controller_tune_estimator(predictive_overshoot_controller_t *context);

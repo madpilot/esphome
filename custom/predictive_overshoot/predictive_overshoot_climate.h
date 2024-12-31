@@ -33,6 +33,11 @@ namespace esphome
 			void set_heating_off_time(unsigned long in);
 			void set_heating_minimum_on_time(unsigned long in);
 			void set_heating_maximum_on_time(unsigned long in);
+			void set_kp(float in);
+			void set_min_percentage_increase(float in);
+			void set_max_percentage_increase(float in);
+			void set_min_percentage_decrease(float in);
+			void set_max_percentage_decrease(float in);
 
 			void run();
 
@@ -58,6 +63,12 @@ namespace esphome
 			unsigned long heating_time_off_{0};
 			unsigned long heating_time_minimum_on_{0};
 			unsigned long heating_time_maximum_on_{0};
+
+			float kp_{0.03};
+			float min_percentage_increase_{1.2};
+			float max_percentage_increase_{1.5};
+			float min_percentage_decrease_{1.17};
+			float max_percentage_decrease_{1.33};
 
 			// unsigned long sample_time_{};
 

@@ -23,6 +23,11 @@ climate:
     min_heating_off_time: 20s
     min_heating_run_time: 5s
     max_heating_run_time: 20s
+    kp: 0.03
+    min_percentage_increase: 1.2
+    max_percentage_increase: 1.5
+    min_percentage_decrease: 1.17
+    max_percentage_decrease: 1.33
 ```
 
 ## Configuration Variables
@@ -47,3 +52,10 @@ The thermostat controller uses the sensor to determine whether it should heat or
 - `min_heating_off_time` (**Optional**, [Time](https://esphome.io/guides/configuration-types#config-time)): Minimum time the heating system needs to be idle between cycles.
 - `min_heating_run_time` (**Optional**, [Time](https://esphome.io/guides/configuration-types#config-time)): Minimum run time the heating system needs to run before becoming idle.
 - `max_heating_run_time` (**Optional**, [Time](https://esphome.io/guides/configuration-types#config-time)): Maximum run time the heating system can run for.
+
+- `kp` (**Optional**, float): Proportional error correction factor. Default: 0.03
+
+- `min_percentage_increase` (**Optional**, float): Minimum percentage to increase the overshoot correction by. Default: 1.2
+- `max_percentage_increase` (**Optional**, float): Maximum percentage to increase the overshoot correction by. Default: 1.5
+- `min_percentage_decrease` (**Optional**, float): Minimum percentage to decrease the overshoot correction by. Default: 1.17
+- `max_percentage_decrease` (**Optional**, float): Maximum percentage to decrease the overshoot correction by. Default: 1.33

@@ -17,6 +17,13 @@ from esphome.const import (
     CONF_MIN_HEATING_RUN_TIME,
     CONF_MAX_HEATING_RUN_TIME,
 )
+from . import (
+    CONF_KP,
+    CONF_MAX_PERCENTAGE_DECREASE,
+    CONF_MAX_PERCENTAGE_INCREASE,
+    CONF_MIN_PERCENTAGE_DECREASE,
+    CONF_MIN_PERCENTAGE_INCREASE,
+)
 
 predictive_overshoot_ns = cg.esphome_ns.namespace("predictive_overshoot")
 PredictiveOvershootClimate = predictive_overshoot_ns.class_(
@@ -33,6 +40,11 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_HEAT_ACTION): automation.validate_automation(single=True),
             cv.Optional(CONF_COOL_DEADBAND): cv.float_,
             cv.Optional(CONF_HEAT_DEADBAND): cv.float_,
+            cv.Optional(CONF_KP): cv.float_,
+            cv.Optional(CONF_MAX_PERCENTAGE_DECREASE): cv.float_,
+            cv.Optional(CONF_MAX_PERCENTAGE_INCREASE): cv.float_,
+            cv.Optional(CONF_MIN_PERCENTAGE_DECREASE): cv.float_,
+            cv.Optional(CONF_MIN_PERCENTAGE_INCREASE): cv.float_,
             cv.Optional(
                 CONF_MIN_COOLING_OFF_TIME
             ): cv.positive_time_period_milliseconds,
@@ -104,3 +116,18 @@ async def to_code(config):
 
     if CONF_MAX_HEATING_RUN_TIME in config:
         cg.add(var.set_heating_maximum_on_time(config[CONF_MAX_HEATING_RUN_TIME]))
+
+    if CONF_KP in config:
+        cg.add(var.set_kp(config[CONF_KP]))
+
+    if CONF_MIN_PERCENTAGE_INCREASE in config:
+        cg.add(var.set_kp(config[CONF_MIN_PERCENTAGE_INCREASE]))
+
+    if CONF_MAX_PERCENTAGE_INCREASE in config:
+        cg.add(var.set_kp(config[CONF_MAX_PERCENTAGE_INCREASE]))
+
+    if CONF_MIN_PERCENTAGE_DECREASE in config:
+        cg.add(var.set_kp(config[CONF_MIN_PERCENTAGE_DECREASE]))
+
+    if CONF_MAX_PERCENTAGE_DECREASE in config:
+        cg.add(var.set_kp(config[CONF_MAX_PERCENTAGE_DECREASE]))

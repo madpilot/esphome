@@ -53,7 +53,9 @@ namespace esphome
 																					 {.lower = this->deadband_lower_, .upper = this->deadband_upper_},
 																					 {.off = this->cooling_time_off_, .minimum_on = this->cooling_time_minimum_on_, .maximum_on = this->cooling_time_maximum_on_},
 																					 {.off = this->heating_time_off_, .minimum_on = this->heating_time_minimum_on_, .maximum_on = this->heating_time_maximum_on_},
-																					 PREDICTIVE_OVERSHOOT_OFF_MODE);
+																					 PREDICTIVE_OVERSHOOT_OFF_MODE,
+																					 this->kp_,
+																					 this->min_percentage_increase_, this->max_percentage_increase_, this->min_percentage_decrease_, this->max_percentage_decrease_);
 
 			this->set_mode();
 
@@ -269,6 +271,29 @@ namespace esphome
 				predictive_overshoot_controller_set_mode(context, PREDICTIVE_OVERSHOOT_OFF_MODE);
 				break;
 			}
+		}
+
+		void PredictiveOvershootClimate::set_kp(float in)
+		{
+			this->kp_ = in;
+		}
+
+		void PredictiveOvershootClimate::set_min_percentage_increase(float in)
+		{
+			this->min_percentage_increase_ = in;
+		}
+
+		void PredictiveOvershootClimate::set_max_percentage_increase(float in)
+		{
+			this->max_percentage_increase_ = in;
+		}
+		void PredictiveOvershootClimate::set_min_percentage_decrease(float in)
+		{
+			this->min_percentage_decrease_ = in;
+		}
+		void PredictiveOvershootClimate::set_max_percentage_decrease(float in)
+		{
+			this->max_percentage_decrease_ = in;
 		}
 
 		void PredictiveOvershootClimate::control(const climate::ClimateCall &call)

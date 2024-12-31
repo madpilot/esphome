@@ -6,7 +6,7 @@ bool predictive_overshoot_controller_get_enable(predictive_overshoot_controller_
 bool predictive_overshoot_controller_can_cool(predictive_overshoot_controller_t *context);
 bool predictive_overshoot_controller_can_heat(predictive_overshoot_controller_t *context);
 
-void predictive_overshoot_controller_init(predictive_overshoot_controller_t *context, float set_point, float_range_t deadband, predictive_overshoot_time_t cooling_time, predictive_overshoot_time_t heating_time, predictive_overshoot_controller_mode_t mode)
+void predictive_overshoot_controller_init(predictive_overshoot_controller_t *context, float set_point, float_range_t deadband, predictive_overshoot_time_t cooling_time, predictive_overshoot_time_t heating_time, predictive_overshoot_controller_mode_t mode, float kp, float min_percentage_increase, float max_percentage_increase, float min_percentage_decrease, float max_percentage_decrease)
 {
   context->set_point = set_point;
   context->deadband = deadband;
@@ -22,6 +22,12 @@ void predictive_overshoot_controller_init(predictive_overshoot_controller_t *con
   context->overshoot_per_hour.upper = 0;
   context->last_output = 0;
   context->time_elapsed = 0;
+
+  context->min_percentage_increase = min_percentage_increase;
+  context->max_percentage_increase = max_percentage_increase;
+  context->min_percentage_decrease = min_percentage_decrease;
+  context->max_percentage_decrease = max_percentage_decrease;
+  context->kp = kp;
 
   context->heating_on = false;
   context->cooling_on = false;
@@ -194,6 +200,36 @@ predictive_overshoot_error_t predictive_overshoot_controller_set_overshoot_per_h
   return E_PREDICTIVE_OVERSHOOT_OK;
 }
 
+predictive_overshoot_error_t predictive_overshoot_controller_set_min_percentage_increase(predictive_overshoot_controller_t *context, float min_percentage_increase)
+{
+  context->min_percentage_increase = min_percentage_increase;
+  return E_PREDICTIVE_OVERSHOOT_OK;
+}
+
+predictive_overshoot_error_t predictive_overshoot_controller_set_max_percentage_increase(predictive_overshoot_controller_t *context, float max_percentage_increase)
+{
+  context->max_percentage_increase = max_percentage_increase;
+  return E_PREDICTIVE_OVERSHOOT_OK;
+}
+
+predictive_overshoot_error_t predictive_overshoot_controller_set_min_percentage_decrease(predictive_overshoot_controller_t *context, float min_percentage_decrease)
+{
+  context->min_percentage_decrease = min_percentage_decrease;
+  return E_PREDICTIVE_OVERSHOOT_OK;
+}
+
+predictive_overshoot_error_t predictive_overshoot_controller_set_max_percentage_decrease(predictive_overshoot_controller_t *context, float max_percentage_decrease)
+{
+  context->max_percentage_decrease = max_percentage_decrease;
+  return E_PREDICTIVE_OVERSHOOT_OK;
+}
+
+predictive_overshoot_error_t predictive_overshoot_controller_set_kp(predictive_overshoot_controller_t *context, float kp)
+{
+  context->kp = kp;
+  return E_PREDICTIVE_OVERSHOOT_OK;
+}
+
 void predictive_overshoot_controller_enable(predictive_overshoot_controller_t *context, bool enable)
 {
   if (enable)
@@ -240,12 +276,6 @@ float predictive_overshoot_controller_estimate_overshoot(predictive_overshoot_co
   return context->current_input + (time_elapsed_in_seconds * overshoot_per_hour / 3600);
 }
 
-static const float MIN_PERCENTAGE_INCREASE = 1.2;
-static const float MAX_PERCENTAGE_INCREASE = 1.5;
-static const float MIN_PERCENTAGE_DECREASE = 1.17;
-static const float MAX_PERCENTAGE_DECREASE = 1.33;
-static const float KP = 0.03;
-
 void predictive_overshoot_controller_tune_estimator(predictive_overshoot_controller_t *context)
 {
   float error = 0;
@@ -269,20 +299,20 @@ void predictive_overshoot_controller_tune_estimator(predictive_overshoot_control
 
   if (error > 0)
   {
-    multiplier = MIN_PERCENTAGE_INCREASE + (KP * error);
-    if (multiplier > MAX_PERCENTAGE_INCREASE)
+    multiplier = context->min_percentage_increase + (context->kp * error);
+    if (multiplier > context->max_percentage_increase)
     {
-      multiplier = MAX_PERCENTAGE_INCREASE;
+      multiplier = context->max_percentage_increase;
     }
     *overshoot *= multiplier;
   }
   else if (error < 0)
   {
-    multiplier = MIN_PERCENTAGE_DECREASE + (KP * -error);
+    multiplier = context->min_percentage_decrease + (context->kp * -error);
 
-    if (multiplier > MAX_PERCENTAGE_DECREASE)
+    if (multiplier > context->max_percentage_decrease)
     {
-      multiplier = MAX_PERCENTAGE_DECREASE;
+      multiplier = context->max_percentage_decrease;
     }
     *overshoot /= multiplier;
   }
