@@ -33,12 +33,24 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_HEAT_ACTION): automation.validate_automation(single=True),
             cv.Optional(CONF_COOL_DEADBAND): cv.float_,
             cv.Optional(CONF_HEAT_DEADBAND): cv.float_,
-            cv.Optional(CONF_MIN_COOLING_OFF_TIME): cv.positive_time_period_seconds,
-            cv.Optional(CONF_MIN_COOLING_RUN_TIME): cv.positive_time_period_seconds,
-            cv.Optional(CONF_MAX_COOLING_RUN_TIME): cv.positive_time_period_seconds,
-            cv.Optional(CONF_MIN_HEATING_OFF_TIME): cv.positive_time_period_seconds,
-            cv.Optional(CONF_MIN_HEATING_RUN_TIME): cv.positive_time_period_seconds,
-            cv.Optional(CONF_MAX_HEATING_RUN_TIME): cv.positive_time_period_seconds,
+            cv.Optional(
+                CONF_MIN_COOLING_OFF_TIME
+            ): cv.positive_time_period_milliseconds,
+            cv.Optional(
+                CONF_MIN_COOLING_RUN_TIME
+            ): cv.positive_time_period_milliseconds,
+            cv.Optional(
+                CONF_MAX_COOLING_RUN_TIME
+            ): cv.positive_time_period_milliseconds,
+            cv.Optional(
+                CONF_MIN_HEATING_OFF_TIME
+            ): cv.positive_time_period_milliseconds,
+            cv.Optional(
+                CONF_MIN_HEATING_RUN_TIME
+            ): cv.positive_time_period_milliseconds,
+            cv.Optional(
+                CONF_MAX_HEATING_RUN_TIME
+            ): cv.positive_time_period_milliseconds,
         }
     ).extend(cv.COMPONENT_SCHEMA),
     cv.has_at_least_one_key(CONF_COOL_ACTION, CONF_HEAT_ACTION),
@@ -58,11 +70,13 @@ async def to_code(config):
     )
 
     if CONF_COOL_ACTION in config:
+        cg.add(var.set_supports_cooling(True))
         await automation.build_automation(
             var.get_cool_action_trigger(), [], config[CONF_COOL_ACTION]
         )
 
     if CONF_HEAT_ACTION in config:
+        cg.add(var.set_supports_heating(True))
         await automation.build_automation(
             var.get_heat_action_trigger(), [], config[CONF_HEAT_ACTION]
         )

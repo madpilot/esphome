@@ -55,10 +55,7 @@ climate:
     heat_deadband: 1
     min_cooling_off_time: 20s
     min_cooling_run_time: 5s
-    max_cooling_run_time: 20s
-    min_heating_off_time: 20s
-    min_heating_run_time: 5s
-    max_heating_run_time: 20s
+    max_cooling_run_time: 60s
 
 logger:
 

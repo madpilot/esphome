@@ -90,6 +90,9 @@ extern "C"
 
   bool predictive_overshoot_controller_is_cooling(predictive_overshoot_controller_t *context);
   bool predictive_overshoot_controller_is_heating(predictive_overshoot_controller_t *context);
+
+  void predictive_overshoot_controller_set_enable(predictive_overshoot_controller_t *context, bool enabled);
+  bool predictive_overshoot_controller_is_enabled(predictive_overshoot_controller_t *context);
 #ifdef __cplusplus
 }
 #endif

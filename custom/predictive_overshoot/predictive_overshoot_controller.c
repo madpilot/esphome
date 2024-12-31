@@ -14,7 +14,7 @@ void predictive_overshoot_controller_init(predictive_overshoot_controller_t *con
   context->heating_time = heating_time;
 
   context->state = PREDICTIVE_OVERSHOOT_IDLE;
-  context->sample_time = 100;
+  context->sample_time = 1000;
   context->peak = 0;
   context->estimated_peak = 0;
   context->current_input = 0;
@@ -26,7 +26,7 @@ void predictive_overshoot_controller_init(predictive_overshoot_controller_t *con
   context->heating_on = false;
   context->cooling_on = false;
 
-  predictive_overshoot_controller_set_enable(context, true);
+  predictive_overshoot_controller_set_enable(context, false);
   predictive_overshoot_controller_set_mode(context, mode);
 }
 
@@ -292,11 +292,11 @@ void predictive_overshoot_controller_set_enable(predictive_overshoot_controller_
 {
   if (enable)
   {
-    context->mode &= ~PREDICTIVE_OVERSHOOT_ENABLE_MASK;
+    context->mode |= PREDICTIVE_OVERSHOOT_ENABLE_MASK;
   }
   else
   {
-    context->mode |= PREDICTIVE_OVERSHOOT_ENABLE_MASK;
+    context->mode &= ~PREDICTIVE_OVERSHOOT_ENABLE_MASK;
   }
 }
 
