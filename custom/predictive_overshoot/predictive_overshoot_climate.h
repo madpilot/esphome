@@ -40,6 +40,7 @@ namespace esphome
 			void set_max_percentage_decrease(float in);
 
 			void run();
+			void state_callback(float state);
 
 		protected:
 			void control(const climate::ClimateCall &call) override;

@@ -23,6 +23,9 @@ one_wire:
     pin: GPIO25
 
 sensor:
+  - platform: climate_simulator
+    id: kegerator_simulator
+
   - platform: dallas_temp
     id: temperature
     name: "Temperature"
@@ -46,16 +49,18 @@ switch:
 climate:
   - platform: predictive_overshoot
     name: "Kegerator"
-    sensor: temperature
+    sensor: kegerator_simulator
     cool_action:
       - switch.turn_on: compressor
+      - climate_simulator.cooling_on: kegerator_simulator
     idle_action:
       - switch.turn_off: compressor
+      - climate_simulator.cooling_off: kegerator_simulator
     cool_deadband: 1
     heat_deadband: 1
-    min_cooling_off_time: 20s
-    min_cooling_run_time: 5s
-    max_cooling_run_time: 60s
+    min_cooling_off_time: 300s
+    min_cooling_run_time: 60s
+    max_cooling_run_time: 300s
 
 logger:
 
@@ -67,8 +72,8 @@ ota:
     password: ""
 
 wifi:
-  ssid: !secret iot_wifi_ssid
-  password: !secret iot_wifi_password
+  ssid: !secret osmaston_ssid
+  password: !secret osmaston_wifi_password
 
   ap:
     ssid: "Kegerator"

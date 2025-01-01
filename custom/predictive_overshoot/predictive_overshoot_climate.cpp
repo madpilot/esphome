@@ -13,9 +13,9 @@ namespace esphome
 			auto traits = climate::ClimateTraits();
 
 			// TODO: Make this configurable
-			traits.set_visual_current_temperature_step(0.5);
-			traits.set_visual_min_temperature(-7);
-			traits.set_visual_max_temperature(20);
+			traits.set_visual_current_temperature_step(0.1);
+			traits.set_visual_min_temperature(-4);
+			traits.set_visual_max_temperature(32);
 
 			traits.set_supports_current_temperature(true);
 			traits.set_supports_two_point_target_temperature(false);
@@ -60,8 +60,9 @@ namespace esphome
 			this->set_mode();
 
 			this->sensor_->add_on_state_callback([this](float state)
-																					 { this->current_temperature = state; });
-			this->current_temperature = this->sensor_->state;
+																					 { this->state_callback(state); });
+			this->state_callback(this->sensor_->state);
+
 			this->set_interval(this->context.sample_time, std::bind(&PredictiveOvershootClimate::run, this));
 			this->setup_complete_ = true;
 			this->publish_state();
@@ -149,6 +150,15 @@ namespace esphome
 		void PredictiveOvershootClimate::set_supports_cooling(bool in) { this->supports_cooling_ = in; }
 		void PredictiveOvershootClimate::set_supports_heating(bool in) { this->supports_heating_ = in; }
 
+		void PredictiveOvershootClimate::state_callback(float state)
+		{
+			this->current_temperature = state;
+			if (!std::isnan(state))
+			{
+				predictive_overshoot_controller_update(&(this->context), state);
+			}
+		}
+
 		void PredictiveOvershootClimate::run()
 		{
 			if (!this->setup_complete_)
@@ -169,11 +179,6 @@ namespace esphome
 				ESP_LOGE(TAG, "Current Temperature is now valid! Enabling controller...");
 			}
 
-			if (!std::isnan(this->current_temperature))
-			{
-				context->current_input = this->current_temperature;
-			}
-
 			predictive_overshoot_controller_run(context);
 
 			if (context->cooling_on && this->action != climate::CLIMATE_ACTION_COOLING)
@@ -184,7 +189,6 @@ namespace esphome
 					ESP_LOGI(TAG, "Triggering cooling action");
 					this->cool_action_trigger_->trigger();
 				}
-				this->publish_state();
 			}
 			else if (context->heating_on && this->action != climate::CLIMATE_ACTION_HEATING)
 			{
@@ -194,7 +198,6 @@ namespace esphome
 					ESP_LOGI(TAG, "Triggering heating action");
 					this->heat_action_trigger_->trigger();
 				}
-				this->publish_state();
 			}
 			else if (!context->cooling_on && !context->heating_on && this->action != climate::CLIMATE_ACTION_IDLE)
 			{
@@ -204,8 +207,9 @@ namespace esphome
 					ESP_LOGI(TAG, "Triggering idle action");
 					this->idle_action_trigger_->trigger();
 				}
-				this->publish_state();
 			}
+			this->debug();
+			this->publish_state();
 		}
 
 		void PredictiveOvershootClimate::set_sensor(sensor::Sensor *sensor)
