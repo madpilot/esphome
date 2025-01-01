@@ -73,6 +73,11 @@ namespace esphome
 
 			LOG_CLIMATE("", "Predictive Overshoot", this);
 
+			ESP_LOGCONFIG(TAG, "  Kp: %f", context->kp);
+			ESP_LOGCONFIG(TAG, "  Min Percentage increase: %f", context->min_percentage_increase);
+			ESP_LOGCONFIG(TAG, "  Max Percentage increase: %f", context->max_percentage_increase);
+			ESP_LOGCONFIG(TAG, "  Min Percentage decrease: %f", context->min_percentage_decrease);
+			ESP_LOGCONFIG(TAG, "  Max Percentage decrease: %f", context->max_percentage_decrease);
 			ESP_LOGCONFIG(TAG, "  Cooling Deadband: %f", context->deadband.upper);
 			ESP_LOGCONFIG(TAG, "  Heating Deadband: %f", context->deadband.lower);
 			ESP_LOGCONFIG(TAG, "  Cooling Min Off Time: %i", context->cooling_time.off);
@@ -163,8 +168,6 @@ namespace esphome
 				predictive_overshoot_controller_set_enable(context, true);
 				ESP_LOGE(TAG, "Current Temperature is now valid! Enabling controller...");
 			}
-
-			ESP_LOGI(TAG, "Running predictive overshoot loop.");
 
 			if (!std::isnan(this->current_temperature))
 			{
