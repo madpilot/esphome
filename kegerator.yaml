@@ -31,24 +31,32 @@ sensor:
           alpha: 0.8
           send_every: 30
 
-switch:
-  - platform: gpio
-    id: compressor
-    pin: GPIO16
-    internal: true
-    restore_mode: RESTORE_DEFAULT_OFF
+button:
+  - platform: template
+    name: "Kegerator PID Climate Autotune"
+    on_press:
+      - climate.pid.autotune: kegerator_pid
+
+output:
+  platform: slow_pwm
+  pin: GPIO16
+  period: 1200s
 
 climate:
-  - platform: thermostat
+  - platform: pid
+    id: kegerator_pid
     name: "Kegerator"
     sensor: temperature
-    cool_action:
-      - switch.turn_on: compressor
-    idle_action:
-      - switch.turn_off: compressor
-    min_cooling_off_time: 30s
-    min_cooling_run_time: 30s
-    min_idle_time: 30s
+    default_target_temperature: 7°C
+    cool_output: compressor
+    visual:
+      min_temperature: -7
+      max_temperature: 32
+      temperature_step: 0.1
+    control_parameters:
+      kp: 0
+      ki: 0
+      kd: 0
 
 logger:
 
