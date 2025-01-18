@@ -146,9 +146,9 @@ climate:
       max_temperature: 32
       temperature_step: 0.1
     control_parameters:
-      kp: 0
-      ki: 0
-      kd: 0
+      kp: 0.19714
+      ki: 0.00028
+      kd: 34.89431
 
 logger:
 
