@@ -4,18 +4,45 @@ esphome:
 esp32:
   board: esp32dev
 
-#i2c:
-  #sda: GPI35
-  #scl: GPI32
+i2c:
+  sda: GPIO4
+  scl: GPIO2
 
-#display:
-  #- platform: ssd1306_i2c
-    #model: "SSD1306 128x32"
-    #lambda: |-
-      #it.printf(0, 0, id(my_font), "Temperature: %.1f°C", id(temperature).state
+font:
+  - file: "gfonts://Roboto"
+    id: font_large
+    size: 18
+  - file: "gfonts://Roboto"
+    id: font_small
+    size: 8
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x32"
+    rotation: 180
+    lambda: |-
+      float current_temperature = id(kegerator_pid).current_temperature;
+      float target_temperature = id(kegerator_pid).target_temperature;
+      
+      if(!std::isnan(current_temperature)) {
+        it.printf(0, 0, id(font_large), TextAlign::TOP_LEFT, "%.1f°C", current_temperature);
+      }
+
+      if(!std::isnan(target_temperature)) {
+        it.printf(0, 32, id(font_small), TextAlign::BOTTOM_LEFT, "%.1f°C", target_temperature);
+      }
+
+      if(id(kegerator_pid).mode == CLIMATE_MODE_COOL) {
+        it.filled_rectangle(128 - 16, 0, 128, 15);
+      }
+
+      if(id(kegerator_pid).action == CLIMATE_ACTION_COOLING) {
+        it.filled_rectangle(128 - 16, 16, 128, 31);
+      }
+
 one_wire:
   - platform: gpio
-    pin: GPIO25
+    pin: GPIO18
 
 sensor:
   - platform: dallas_temp
@@ -31,6 +58,70 @@ sensor:
           alpha: 0.8
           send_every: 30
 
+binary_sensor:
+  - platform: gpio
+    id: btn_temp_down
+    pin: 
+      number: GPIO21
+      inverted: true
+      mode:
+          input: true
+          pullup: true
+    filters:
+       autorepeat:
+        - delay: 1s
+          time_off: 100ms
+          time_on: 100ms
+    on_click:
+      lambda: |-
+        float target_temperature = id(kegerator_pid).target_temperature;
+        auto call = id(kegerator_pid).make_call();
+        call.set_target_temperature(target_temperature - 0.1);
+        call.perform();
+    
+
+  - platform: gpio
+    id: btn_temp_up
+    pin:
+      number: GPIO22
+      inverted: true
+      mode:
+          input: true
+          pullup: true
+    filters:
+       autorepeat:
+        - delay: 1s
+          time_off: 100ms
+          time_on: 100ms
+
+    on_click:
+      lambda: |-
+        float target_temperature = id(kegerator_pid).target_temperature;
+        auto call = id(kegerator_pid).make_call();
+        call.set_target_temperature(target_temperature + 0.1);
+        call.perform();
+          
+
+  - platform: gpio
+    id: btn_units
+    pin: 
+      number: GPIO23
+      inverted: true
+      mode:
+          input: true
+          pullup: true
+    on_click:
+      then:
+        lambda: |-
+          auto call = id(kegerator_pid).make_call();
+          if(id(kegerator_pid).mode == CLIMATE_MODE_COOL) {
+            call.set_mode("OFF");
+          } else {
+            call.set_mode("COOL");
+          }
+          call.perform();
+
+
 button:
   - platform: template
     name: "Kegerator PID Climate Autotune"
@@ -38,8 +129,9 @@ button:
       - climate.pid.autotune: kegerator_pid
 
 output:
+  id: compressor
   platform: slow_pwm
-  pin: GPIO16
+  pin: GPIO19
   period: 1200s
 
 climate:
