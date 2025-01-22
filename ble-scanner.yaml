@@ -1,0 +1,40 @@
+esphome:
+  name: "ble-scanner"
+  
+esp32:
+  board: esp32dev
+
+logger:
+
+api:
+  password: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+esp32_ble_tracker:
+
+binary_sensor:
+  - platform: ble_presence
+    mac_address: 00:1C:97:1C:A3:B3 
+    name: "BARW270A3B3 Power"
+    timeout: 30s
+sensor:
+  - platform: ble_rssi
+    mac_address: 00:1C:97:1C:A3:B3 
+    name: "BARW270A3B3"
+
+#text_sensor:
+#  - platform: ble_scanner
+#    name: "BLE Devices Scanner"
+
+wifi:
+  ssid: !secret iot_wifi_ssid
+  password: !secret iot_wifi_password
+
+  ap:
+    ssid: "ble_scanner_poc"
+    password: ""
+
+captive_portal:
