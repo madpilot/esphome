@@ -1,0 +1,126 @@
+esphome:
+  name: fermenter
+  
+esp32:
+  board: esp32dev
+
+i2c:
+  sda: GPIO23
+  scl: GPIO22
+
+font:
+  - file: "gfonts://Roboto"
+    id: font_large
+    size: 18
+  - file: "gfonts://Roboto"
+    id: font_small
+    size: 8
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x32"
+    rotation: 180
+    lambda: |-
+      float current_temperature = id(fermenter_pid).current_temperature;
+      float target_temperature = id(fermenter_pid).target_temperature;
+      
+      if(!std::isnan(current_temperature)) {
+        it.printf(0, 0, id(font_large), TextAlign::TOP_LEFT, "%.1f°C", current_temperature);
+      }
+
+      if(!std::isnan(target_temperature)) {
+        it.printf(0, 32, id(font_small), TextAlign::BOTTOM_LEFT, "%.1f°C", target_temperature);
+      }
+
+      if(id(fermenter_pid).mode == CLIMATE_MODE_COOL) {
+        it.filled_rectangle(128 - 16, 0, 128, 15);
+      }
+
+      if(id(fermenter_pid).action == CLIMATE_ACTION_COOLING) {
+        it.filled_rectangle(128 - 16, 16, 128, 31);
+      }
+
+one_wire:
+  - platform: gpio
+    pin: GPIO4
+
+sensor:
+  - platform: dallas_temp
+    id: temperature
+    name: "Temperature"
+    update_interval: 1s
+    unit_of_measurement: "°C"
+    device_class: "temperature"
+    state_class: "measurement"
+    accuracy_decimals: 1
+    filters:
+      - exponential_moving_average:
+          alpha: 0.8
+          send_every: 30
+
+button:
+  - platform: template
+    name: "Fermenter PID Climate Autotune"
+    on_press:
+      - climate.pid.autotune: fermenter_pid
+
+uart:
+  id: uart_bus
+  tx_pin: GPIO17 
+  rx_pin: GPIO16 
+  baud_rate: 57600
+
+output:
+  - id: compressor
+    platform: slow_pwm
+    period: 1200s
+    turn_on_action:
+      - uart.write: "\rCOMPRESSOR_ON\rFAN_ON\r"
+    turn_off_action:
+      - uart.write: "\rCOMPRESSOR_OFF\rFAN_OFF\r"
+
+  - id: heater
+    platform: slow_pwm
+    period: 1200s
+    turn_on_action:
+      - uart.write: "\rHEATER_ON\r"
+    turn_off_action:
+      - uart.write: "\rHEATER_OFF\r"
+
+
+
+climate:
+  - platform: pid
+    id: fermenter_pid
+    name: "Fermenter"
+    sensor: temperature
+    default_target_temperature: 17°C
+    cool_output: compressor
+    heat_output: heater
+    visual:
+      min_temperature: 0
+      max_temperature: 32
+      temperature_step: 0.1
+    control_parameters:
+      kp: 1.05379
+      ki: 0.00279
+      kd: 99.58290
+
+logger:
+
+api:
+  password: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  ssid: !secret iot_wifi_ssid
+  password: !secret iot_wifi_password
+
+  ap:
+    ssid: "Fermenter"
+    password: ""
+
+captive_portal:
