@@ -2,11 +2,11 @@ esphome:
   name: kegerator
   
 esp32:
-  board: esp32dev
+  board: esp32-s2-saola-1
 
 i2c:
-  sda: GPIO4
-  scl: GPIO2
+  sda: GPIO17
+  scl: GPIO16
 
 font:
   - file: "gfonts://Roboto"
@@ -19,19 +19,22 @@ font:
 display:
   - platform: ssd1306_i2c
     model: "SSD1306 128x32"
-    rotation: 180
     lambda: |-
       float current_temperature = id(kegerator_pid).current_temperature;
       float target_temperature = id(kegerator_pid).target_temperature;
       
       if(!std::isnan(current_temperature)) {
-        it.printf(0, 0, id(font_large), TextAlign::TOP_LEFT, "%.1f°C", current_temperature);
+        it.printf(64, 0, id(font_large), TextAlign::TOP_CENTER, "%.1f°C", current_temperature);
+      } else {
+        it.printf(64, 0, id(font_large), TextAlign::TOP_CENTER, "--°C");
       }
 
       if(!std::isnan(target_temperature)) {
-        it.printf(0, 32, id(font_small), TextAlign::BOTTOM_LEFT, "%.1f°C", target_temperature);
+        it.printf(64, 32, id(font_small), TextAlign::BOTTOM_CENTER, "%.1f°C", target_temperature);
+      } else {
+        it.printf(64, 32, id(font_small), TextAlign::BOTTOM_CENTER, "--°C");
       }
-
+      
       if(id(kegerator_pid).mode == CLIMATE_MODE_COOL) {
         it.filled_rectangle(128 - 16, 0, 128, 15);
       }
@@ -42,7 +45,7 @@ display:
 
 one_wire:
   - platform: gpio
-    pin: GPIO18
+    pin: GPIO15
 
 sensor:
   - platform: dallas_temp
@@ -59,67 +62,67 @@ sensor:
           send_every: 30
 
 binary_sensor:
-  - platform: gpio
-    id: btn_temp_down
-    pin: 
-      number: GPIO21
-      inverted: true
-      mode:
-          input: true
-          pullup: true
-    filters:
-       autorepeat:
-        - delay: 1s
-          time_off: 100ms
-          time_on: 100ms
-    on_click:
-      lambda: |-
-        float target_temperature = id(kegerator_pid).target_temperature;
-        auto call = id(kegerator_pid).make_call();
-        call.set_target_temperature(target_temperature - 0.1);
-        call.perform();
+  #- platform: gpio
+    #id: btn_temp_down
+    #pin: 
+      #number: GPIO21
+      #inverted: true
+      #mode:
+          #input: true
+          #pullup: true
+    #filters:
+       #autorepeat:
+        #- delay: 1s
+          #time_off: 100ms
+          #time_on: 100ms
+    #on_click:
+      #lambda: |-
+        #float target_temperature = id(kegerator_pid).target_temperature;
+        #auto call = id(kegerator_pid).make_call();
+        #call.set_target_temperature(target_temperature - 0.1);
+        #call.perform();
     
 
-  - platform: gpio
-    id: btn_temp_up
-    pin:
-      number: GPIO22
-      inverted: true
-      mode:
-          input: true
-          pullup: true
-    filters:
-       autorepeat:
-        - delay: 1s
-          time_off: 100ms
-          time_on: 100ms
+  #- platform: gpio
+    #id: btn_temp_up
+    #pin:
+      #number: GPIO26
+      #inverted: true
+      #mode:
+          #input: true
+          #pullup: true
+    #filters:
+       #autorepeat:
+        #- delay: 1s
+          #time_off: 100ms
+          #time_on: 100ms
 
-    on_click:
-      lambda: |-
-        float target_temperature = id(kegerator_pid).target_temperature;
-        auto call = id(kegerator_pid).make_call();
-        call.set_target_temperature(target_temperature + 0.1);
-        call.perform();
+    #on_click:
+      #lambda: |-
+        #float target_temperature = id(kegerator_pid).target_temperature;
+        #auto call = id(kegerator_pid).make_call();
+        #call.set_target_temperature(target_temperature + 0.1);
+        #call.perform();
           
 
-  - platform: gpio
-    id: btn_units
-    pin: 
-      number: GPIO23
-      inverted: true
-      mode:
-          input: true
-          pullup: true
-    on_click:
-      then:
-        lambda: |-
-          auto call = id(kegerator_pid).make_call();
-          if(id(kegerator_pid).mode == CLIMATE_MODE_COOL) {
-            call.set_mode("OFF");
-          } else {
-            call.set_mode("COOL");
-          }
-          call.perform();
+  #- platform: gpio
+    #id: btn_units
+    #pin: 
+      #number: GPIO23
+      #inverted: true
+      #mode:
+          #input: true
+          #pullup: true
+    #on_click:
+      #then:
+        #lambda: |-
+          #auto call = id(kegerator_pid).make_call();
+          #if(id(kegerator_pid).mode == CLIMATE_MODE_COOL) {
+            #call.set_mode("OFF");
+          #} else {
+            #call.set_mode("COOL");
+          #}
+          #call.perform();
 
 
 button:
@@ -131,7 +134,7 @@ button:
 output:
   id: compressor
   platform: slow_pwm
-  pin: GPIO19
+  pin: GPIO18
   period: 1200s
 
 climate:
@@ -167,4 +170,4 @@ wifi:
     ssid: "Kegerator"
     password: ""
 
-captive_portal:
+#captive_por8al:
