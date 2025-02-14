@@ -59,6 +59,27 @@ sensor:
 
 binary_sensor:
   - platform: gpio
+    id: btn_temp_up
+    pin:
+      number: GPIO14
+      inverted: true
+      mode:
+          input: true
+          pullup: true
+    filters:
+       autorepeat:
+        - delay: 1s
+          time_off: 100ms
+          time_on: 100ms
+
+    on_click:
+      lambda: |-
+        float target_temperature = id(kegerator_pid).target_temperature;
+        auto call = id(kegerator_pid).make_call();
+        call.set_target_temperature(target_temperature + 0.1);
+        call.perform();
+ 
+  - platform: gpio
     id: btn_temp_down
     pin: 
       number: GPIO21
@@ -77,29 +98,6 @@ binary_sensor:
         auto call = id(kegerator_pid).make_call();
         call.set_target_temperature(target_temperature - 0.1);
         call.perform();
-    
-
-  #- platform: gpio
-    #id: btn_temp_up
-    #pin:
-      #number: GPIO21
-      #inverted: true
-      #mode:
-          #input: true
-          #pullup: true
-    #filters:
-       #autorepeat:
-        #- delay: 1s
-          #time_off: 100ms
-          #time_on: 100ms
-
-    #on_click:
-      #lambda: |-
-        #float target_temperature = id(kegerator_pid).target_temperature;
-        #auto call = id(kegerator_pid).make_call();
-        #call.set_target_temperature(target_temperature + 0.1);
-        #call.perform();
-          
 
   - platform: gpio
     id: btn_units
