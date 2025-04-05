@@ -1,6 +1,6 @@
 esphome:
   name: kegerator
-  
+
 esp32:
   board: esp32-s2-saola-1
 
@@ -22,7 +22,7 @@ display:
     lambda: |-
       float current_temperature = id(kegerator_pid).current_temperature;
       float target_temperature = id(kegerator_pid).target_temperature;
-      
+
       if(id(kegerator_pid).mode == CLIMATE_MODE_COOL) {
         if(!std::isnan(current_temperature)) {
           it.printf(64, 0, id(font_large), TextAlign::TOP_CENTER, "%.1f°C", current_temperature);
@@ -38,7 +38,7 @@ display:
       } else {
         it.printf(64, 32, id(font_small), TextAlign::BOTTOM_CENTER, "--°C");
       }
-      
+
 one_wire:
   - platform: gpio
     pin: GPIO15
@@ -64,10 +64,10 @@ binary_sensor:
       number: GPIO14
       inverted: true
       mode:
-          input: true
-          pullup: true
+        input: true
+        pullup: true
     filters:
-       autorepeat:
+      autorepeat:
         - delay: 1s
           time_off: 100ms
           time_on: 100ms
@@ -78,17 +78,17 @@ binary_sensor:
         auto call = id(kegerator_pid).make_call();
         call.set_target_temperature(target_temperature + 0.1);
         call.perform();
- 
+
   - platform: gpio
     id: btn_temp_down
-    pin: 
+    pin:
       number: GPIO21
       inverted: true
       mode:
-          input: true
-          pullup: true
+        input: true
+        pullup: true
     filters:
-       autorepeat:
+      autorepeat:
         - delay: 1s
           time_off: 100ms
           time_on: 100ms
@@ -101,12 +101,12 @@ binary_sensor:
 
   - platform: gpio
     id: btn_units
-    pin: 
-      number: GPIO20      
+    pin:
+      number: GPIO20
       inverted: true
       mode:
-          input: true
-          pullup: true
+        input: true
+        pullup: true
     on_click:
       then:
         lambda: |-
@@ -117,7 +117,6 @@ binary_sensor:
             call.set_mode("COOL");
           }
           call.perform();
-
 
 button:
   - platform: template
@@ -163,5 +162,4 @@ wifi:
   ap:
     ssid: "Kegerator"
     password: ""
-
-#captive_por8al:
+#captive_portal:
