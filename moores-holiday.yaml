@@ -1,0 +1,69 @@
+esphome:
+  name: moorescloud-holiday
+
+esp32:
+  board: esp32-s2-saola-1
+
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    chipset: ws2812
+    pin: GPIO15
+    num_leds: 50
+    rmt_channel: 0
+    use_psram: false
+    default_transition_length: 0s
+    name: "Moorescloud Holiday"
+    effects:
+      - pulse:
+      - random:
+      - strobe: 
+      - flicker:
+      - addressable_rainbow:
+      - addressable_color_wipe:
+      - addressable_scan:
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
+
+binary_sensor:
+  - platform: gpio
+    name: "Button 1"
+    pin:
+      number: GPIO14
+      inverted: false
+      mode:
+        input: true
+        pullup: false
+
+  - platform: gpio
+    name: "Button 2"
+    pin:
+      number: GPIO17
+      inverted: false
+      mode:
+        input: true
+        pullup: false 
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: ""
+
+ota:
+  - platform: esphome
+    password: ""
+
+wifi:
+  ssid: !secret iot_wifi_ssid
+  password: !secret iot_wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "MooresCloud"
+    password: ""
+
+captive_portal:
