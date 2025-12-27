@@ -500,6 +500,7 @@ script:
                         - lambda: |
                             switch(id(voice_assistant_phase)) {
                               case ${voice_assist_waiting_for_command_phase_id}:
+                              case ${voice_assist_listening_for_command_phase_id}:
                                 id(s3_box_lcd).show_page(listening_page);
                                 id(s3_box_lcd).update();
                                 break;
@@ -1034,9 +1035,13 @@ voice_assistant:
                 - lambda: id(voice_assistant_phase) = ${voice_assist_master_mute_switched_phase_id};
           - script.execute: draw_display
   on_client_connected:
-    - lambda: id(init_in_progress) = false;
+    - if:
+        condition:
+          lambda: return id(init_in_progress);
+        then:
+          - lambda: id(init_in_progress) = false;
+          - lambda: id(voice_assistant_phase) = ${voice_assist_idle_phase_id};
     - micro_wake_word.start:
-    - lambda: id(voice_assistant_phase) = ${voice_assist_idle_phase_id};
     - script.execute: draw_display
   on_client_disconnected:
     - voice_assistant.stop:
