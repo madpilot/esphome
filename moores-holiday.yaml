@@ -18,6 +18,37 @@ esp32:
       CONFIG_RMT_RECV_FUNC_IN_IRAM: "y"
       CONFIG_RMT_ISR_IRAM_SAFE: "y"
 
+globals:
+  - id: animation_frame
+    type: int
+    restore_value: no
+    initial_value: "0"
+  - id: fade_direction
+    type: int
+    restore_value: no
+    initial_value: "1"
+  - id: fade_speed
+    type: int
+    restore_value: no
+    initial_value: '255'
+  - id: show_santa
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  - id: santa_index
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: santa_frame
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: santa_speed
+    type: int
+    restore_value: no
+    initial_value: '10'
+
+
 light:
   - platform: esp32_rmt_led_strip
     id: leds
@@ -41,7 +72,51 @@ light:
       - addressable_random_twinkle:
       - addressable_fireworks:
       - addressable_flicker:
+      - addressable_lambda:
+          name: "Christmas"
+          lambda: |-
+            if(id(animation_frame) >= id(fade_speed)) {
+              id(animation_frame) = id(fade_speed);
+              id(fade_direction) = -1;
+            }
+            if(id(animation_frame) <= 0) {
+              id(animation_frame) = 0;
+              id(fade_direction) = 1;
+            }
 
+            if(!id(show_santa)) {
+              id(show_santa) = rand() < (RAND_MAX / 5000);
+            }
+            if(id(show_santa) && id(santa_index) >= it.size()) {
+              id(santa_index) = 0;
+              id(show_santa) = false;
+            }
+
+            uint8_t red = (id(animation_frame) * 255) / id(fade_speed);
+            uint8_t green = ((id(fade_speed) - id(animation_frame)) * 255) / id(fade_speed);
+            for(int i = 0; i < it.size(); i++) {
+              if(i % 2 == 0) {
+                it[i] = Color(red, green, 0);
+              } else {
+                it[i] = Color(green, red, 0);
+              }
+              if(id(show_santa) && id(santa_index) == i) {
+                for(int trail = 0; trail < 5; trail++) {
+                  if(i - trail > 0) {
+                    uint8_t trail_color = (5 - trail) * 255 / 5;
+                    it[i - trail] = Color(max(red, trail_color), max(green, trail_color), trail_color);
+                  }
+                }
+              }
+            }
+            id(animation_frame) += id(fade_direction);
+            
+            id(santa_frame) += 1;
+            if(id(show_santa) && id(santa_frame) >= id(santa_speed)) {
+              id(santa_index) += 1;
+              id(santa_frame) = 0;
+            }
+            
 binary_sensor:
   - platform: gpio
     name: "Button 1"
