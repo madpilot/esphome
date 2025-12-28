@@ -1,18 +1,33 @@
 esphome:
   name: moorescloud-holiday
+  on_boot:
+    - light.turn_on:
+        id: leds
+        red: 0
+        green: 100%
+        blue: 100%
+        effect: "Scan"
 
 esp32:
   board: esp32-s2-saola-1
+  cpu_frequency: 240MHz
+  framework:
+    type: esp-idf
+    version: 5.5.1
+    sdkconfig_options:
+      CONFIG_RMT_RECV_FUNC_IN_IRAM: "y"
+      CONFIG_RMT_ISR_IRAM_SAFE: "y"
 
 light:
   - platform: esp32_rmt_led_strip
+    id: leds
     rgb_order: GRB
     chipset: ws2812
     pin: GPIO15
     num_leds: 50
-    rmt_channel: 0
+    # rmt_channel: 0
     use_psram: false
-    default_transition_length: 0s
+    default_transition_length: 2s
     name: "Moorescloud Holiday"
     effects:
       - pulse:
@@ -26,62 +41,6 @@ light:
       - addressable_random_twinkle:
       - addressable_fireworks:
       - addressable_flicker:
-      - addressable_lambda:
-          name: "Christmas Tree - Fading"
-          update_interval: 0.1s
-          lambda: |-
-            const static int cycle_duration = 5000;       // Set the duration for a full fade cycle (in milliseconds)
-            const static float slow_cycle_factor = 0.25;  // The factor for the slow cycles
-
-            const int color1[3] = {255, 0, 18};
-            const int color2[3] = {0, 179, 44};
-
-            int fade = (esp_timer_get_time() / 1000) % (15 * cycle_duration);            // 15 cycles in total
-            float fade_speed = (fade / cycle_duration) < 10 ? 1.0 : slow_cycle_factor;   // Fade speed based on the cycle count
-
-            float brightness = sin((fade * 2 * M_PI) / (cycle_duration * fade_speed)) * 0.5 + 0.5; // Sinusoidal fade function
-
-            for (int i = 0; i < it.size(); i++) {
-              int red = (1 - brightness) * color1[0];
-              int green = (1 - brightness) * color1[1];
-              int blue = (1 - brightness) * color1[2];
-
-              if (i % 2 == 0) {
-                red = brightness * color2[0];
-                green = brightness * color2[1];
-                blue = brightness * color2[2];
-              }
-
-              it[i] = Color(red, green, blue);
-            }
-      - addressable_lambda:
-          name: "Halloween - Fading"
-          update_interval: 0.1s
-          lambda: |-
-            const static int cycle_duration = 5000;       // Set the duration for a full fade cycle (in milliseconds)
-            const static float slow_cycle_factor = 0.25;  // The factor for the slow cycles
-
-            const int color1[3] = {255, 165, 0};
-            const int color2[3] = {128, 0, 128};
-
-            int fade = (esp_timer_get_time() / 1000) % (15 * cycle_duration);            // 15 cycles in total
-            float fade_speed = (fade / cycle_duration) < 10 ? 1.0 : slow_cycle_factor;   // Fade speed based on the cycle count
-
-            float brightness = sin((fade * 2 * M_PI) / (cycle_duration * fade_speed)) * 0.5 + 0.5; // Sinusoidal fade function
-
-            for (int i = 0; i < it.size(); i++) {
-              int red = (1 - brightness) * color1[0];
-              int green = (1 - brightness) * color1[1];
-              int blue = (1 - brightness) * color1[2];
-
-              if (i % 2 == 0) {
-                red = brightness * color2[0];
-                green = brightness * color2[1];
-                blue = brightness * color2[2];
-              }
-
-              it[i] = Color(red, green, blue);
-            }
 
 binary_sensor:
   - platform: gpio
@@ -116,10 +75,35 @@ ota:
 wifi:
   ssid: !secret iot_wifi_ssid
   password: !secret iot_wifi_password
+  power_save_mode: none
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "MooresCloud"
     password: ""
+
+  on_connect:
+    - if:
+        condition:
+          wifi.connected:
+        then:
+          - light.turn_off:
+              id: leds
+        else:
+          - light.turn_on:
+              id: leds
+              red: 100%
+              green: 0 
+              blue: 0
+              effect: "None"
+
+  on_disconnect:
+    - light.turn_on:
+        id: leds
+        red: 0
+        green: 100%
+        blue: 100%
+        effect: "Scan"
+
 
 captive_portal:
