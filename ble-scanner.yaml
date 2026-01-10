@@ -3,7 +3,9 @@ esphome:
   
 esp32:
   board: esp32dev
-
+  framework:
+    type: esp-idf
+ 
 logger:
 
 api:
@@ -15,16 +17,111 @@ ota:
 
 esp32_ble_tracker:
 
+ble_client:
+  - mac_address: A0:BB:3E:C0:61:19
+    id: redi_chek_6119
+    auto_connect: true
+    on_connect:
+      then:
+        - lambda: |-
+            ESP_LOGD("ble_client_lambda", "Connected to BLE device");
+    on_disconnect:
+      then:
+        - lambda: |-
+            ESP_LOGD("ble_client_lambda", "Disconnected from BLE device");
+
 binary_sensor:
   - platform: ble_presence
     mac_address: 00:1C:97:1C:A3:B3 
     name: "BARW270A3B3 Power"
     timeout: 30s
+
 sensor:
   - platform: ble_rssi
     mac_address: 00:1C:97:1C:A3:B3 
     name: "BARW270A3B3"
 
+  - platform: ble_client
+    type: rssi
+    name: "Redi-Chek_6119 RSSI"
+    ble_client_id: redi_chek_6119
+
+  - platform: ble_client
+    type: characteristic
+    ble_client_id: redi_chek_6119
+    name: "Redi-Chek_6119 Battery Level"
+    service_uuid: '180f'
+    characteristic_uuid: '2a19'
+    icon: 'mdi:battery'
+    unit_of_measurement: '%'
+
+  - platform: ble_client
+    type: characteristic
+    ble_client_id: redi_chek_6119
+    name: "Redi-Chek_6119 Probe 1"
+    service_uuid: '4E7777FB-78C4-4BC7-A8AC-3A95DCDBB041'
+    characteristic_uuid: 'E73C489A-B8BB-494E-86C5-01FD7341F217'
+    icon: 'mdi:thermometer'
+    notify: True
+    #update_interval: 10s
+    lambda: |-
+      const int16_t temp_val = (x[1] <<8) + x[0];
+      const float temperature_fahrenheit = (temp_val -54);
+      const float temperature_celsius = (((temp_val -54) -32)/1.8);
+      return temperature_celsius;
+    unit_of_measurement: "°C"
+    device_class: temperature
+
+  - platform: ble_client
+    type: characteristic
+    ble_client_id: redi_chek_6119
+    name: "Redi-Chek_6119 Probe 2"
+    service_uuid: '4E7777FB-78C4-4BC7-A8AC-3A95DCDBB041'
+    characteristic_uuid: '80A6C886-EAC2-489D-80DC-D264DFC210C2'
+    icon: 'mdi:thermometer'
+    notify: True
+    #update_interval: 10s
+    lambda: |-
+      const int16_t temp_val2 = (x[1] <<8) + x[0];
+      const float temperature_fahrenheit2 = (temp_val2 -54);
+      const float temperature_celsius2 = (((temp_val2 -54) -32)/1.8);
+      return temperature_celsius2;
+    unit_of_measurement: "°C"
+    device_class: temperature
+
+  - platform: ble_client
+    type: characteristic
+    ble_client_id: redi_chek_6119
+    name: "Redi-Chek_6119 Probe 3"
+    service_uuid: '4E7777FB-78C4-4BC7-A8AC-3A95DCDBB041'
+    characteristic_uuid: '3E430FDD-525B-455A-8AB2-9DC9DBB15F07'
+    icon: 'mdi:thermometer'
+    notify: True
+    #update_interval: 10s
+    lambda: |-
+      const int16_t temp_val3 = (x[1] <<8) + x[0];
+      const float temperature_fahrenheit3 = (temp_val3 -54);
+      const float temperature_celsius3 = (((temp_val3 -54) -32)/1.8);
+      return temperature_celsius3;
+    unit_of_measurement: "°C"
+    device_class: temperature
+
+  - platform: ble_client
+    type: characteristic
+    ble_client_id: redi_chek_6119
+    name: "Redi-Chek_6119 Probe 4"
+    service_uuid: '4E7777FB-78C4-4BC7-A8AC-3A95DCDBB041'
+    characteristic_uuid: '43536D93-8BD6-451D-8F2E-C54B0516FE8B'
+    icon: 'mdi:thermometer'
+    notify: True
+    #update_interval: 10s
+    lambda: |-
+      const int16_t temp_val4 = (x[1] <<8) + x[0];
+      const float temperature_fahrenheit4 = (temp_val4 -54);
+      const float temperature_celsius4 = (((temp_val4 -54) -32)/1.8);
+      return temperature_celsius4;
+    unit_of_measurement: "°C"
+    device_class: temperature
 #text_sensor:
 #  - platform: ble_scanner
 #    name: "BLE Devices Scanner"
