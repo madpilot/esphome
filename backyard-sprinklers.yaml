@@ -29,7 +29,9 @@ switch:
     pin: GPIO26
     internal: true
     restore_mode: ALWAYS_OFF
-
+  - platform: homeassistant
+    id: main_valve
+    entity_id: switch.0xf044d3fffef9922c
 sprinkler:
   - id: backyard_controller
     main_switch: "Backyard Sprinklers"
@@ -45,6 +47,8 @@ sprinkler:
           initial_value: 20
           unit_of_measurement: min
         valve_switch_id: zone_1
+        pump_switch_id: main_valve
+
       - valve_switch: "Side Lawn"
         enable_switch: "Enable Side Lawn"
         run_duration_number: 
@@ -52,6 +56,7 @@ sprinkler:
           initial_value: 20
           unit_of_measurement: min
         valve_switch_id: zone_3
+        pump_switch_id: main_valve
       - valve_switch: "Vegetable Patch"
         enable_switch: "Enable Vegetable Patch"
         run_duration_number:
@@ -59,6 +64,7 @@ sprinkler:
           initial_value: 10
           unit_of_measurement: min
         valve_switch_id: zone_2
+        pump_switch_id: main_valve
       - valve_switch: "Side Garden Bed"
         enable_switch: "Enable Side Garden Bed"
         run_duration_number: 
@@ -66,6 +72,7 @@ sprinkler:
           initial_value: 10
           unit_of_measurement: min
         valve_switch_id: zone_4
+        pump_switch_id: main_valve
 
 # Enable logging
 logger:
