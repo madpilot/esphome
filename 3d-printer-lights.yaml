@@ -1,0 +1,53 @@
+esphome:
+  name: "3d-printer-lights"
+
+esp32:
+  board: esp32-s2-saola-1
+  cpu_frequency: 240MHz
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      CONFIG_RMT_RECV_FUNC_IN_IRAM: "y"
+      CONFIG_RMT_ISR_IRAM_SAFE: "y"
+
+
+light:
+  - platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    chipset: WS2812
+    pin: GPIO16
+    num_leds: 110
+    use_psram: false
+    name: "Workbench Light"
+    power_supply: power_supply_relay
+    effects:
+      - pulse:
+      - random:
+      - strobe: 
+      - flicker:
+      - addressable_rainbow:
+      - addressable_color_wipe:
+      - addressable_scan:
+      - addressable_twinkle:
+      - addressable_random_twinkle:
+      - addressable_fireworks:
+      - addressable_flicker:
+
+power_supply:
+  - id: 'power_supply_relay'
+    pin: GPIO21
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret iot_wifi_ssid
+  password: !secret iot_wifi_password
+
+captive_portal:
