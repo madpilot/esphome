@@ -79,7 +79,6 @@ logger:
 
 # Enable Home Assistant API
 api:
-  password: ""
   actions:
     - action: clear_queued_valves
       then:
